@@ -193,20 +193,45 @@ pop_vs_soda %>%
   adorn_totals("row")
 ```
 
-P(B) = 0.62
+P(A) = 0.37
 
--   The prior probability (an [unconditional probability](https://www.bayesrulesbook.com/chapter-2#building-a-bayesian-model-for-events:~:text=two%20events.%20The-,unconditional%20probability,-of)) that the people from the south don't say pop is 0.6
+-   The prior probability (an [unconditional probability](https://www.bayesrulesbook.com/chapter-2#building-a-bayesian-model-for-events:~:text=two%20events.%20The-,unconditional%20probability,-of)) that the people say pop in general
 
 ```{r}
-prior_probability_pop_false <- 0.6
+prior_probability_pop_true <- 0.37
 ```
 
-P(Bc) = 0.37
+P(S) = 0.24
 
--   The prior probability (an unconditional probability) that the person is from the south
+```{r}
+prior_probability_region <- 0.24
+```
+
+The people that are from the south
 
 ```{r}
 pop_vs_soda %>% 
-  tabyl(title_has_excl) %>% 
+  tabyl(region) %>% 
   adorn_totals("row")
+```
+
+```{r}
+pop_vs_soda %>% 
+  tabyl(pop, region) %>% 
+  adorn_percentages("col") 
+```
+
+P(S\|A) = 0.079
+
+People from the south that says pop
+
+```{r}
+likelihood_probability_pop_region <- 0.079
+```
+
+P(S\|A) = P(A)L(A\|S)/P(A)
+
+```{r}
+(prior_probability_pop_true * likelihood_probability_pop_region) /
+  prior_probability_region
 ```
