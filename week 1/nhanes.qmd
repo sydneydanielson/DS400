@@ -76,8 +76,8 @@ df <- df %>%
   filter(DIQ010 %in% c(1, 2), DRD370B %in% c(1, 2)) %>%
   # Recode 1 to "Yes" and 2 to "No" for DIQ010 and DRD360
   mutate(
-    DIQ010 = ifelse(DIQ010 == 1, "Yes", "No"),
-    DRD370B = ifelse(DRD370B == 1, "Yes", "No")
+    DIQ010 = ifelse(DIQ010 == 1, "Has Diabetes", "No Diabetes"),
+    DRD370B = ifelse(DRD370B == 1, "Consumes Ahi", "No Ahi")
   )
   
 ```
@@ -88,9 +88,89 @@ df <- df %>%
     skim(df)
     ```
 
-3.  Do some exploratory data analysis
+    ### Bayes Theorem
 
-4.  Determine the prior probability that someone has diabetes (DIQ010)
+    ### P(B\|A) = P(B)L(B\|A) / P(A)
+
+    ### B \<- Has Diabetes
+
+    ### A \<- Consumes Ahi
+
+#### P(B)
+
+The probability that a person has diabetes
+
+```{r}
+df %>%
+  tabyl(DIQ010)
+
+```
+
+#### L(B\|A) = P(A\|B)
+
+```{r}
+df %>% 
+  tabyl(DRD370B, DIQ010) %>% 
+  adorn_percentages("col")
+```
+
+```{r}
+probabilty_has_diabetes <- 0.13
+```
+
+```{r}
+probability_consumes_ahi_given_diabetes <- 0.36
+```
+
+#### P(A)
+
+```{r}
+df %>% 
+  tabyl(DRD370B)
+```
+
+```{r}
+probability_consumes_ahi <- 0.36
+```
+
+#### P(B\|A)
+
+```{r}
+(probabilty_has_diabetes * probability_consumes_ahi_given_diabetes
+  / probability_consumes_ahi)
+```
+
+#### Diabetes & Age
+
+```{r}
+deographics <- demographics %>% 
+  select(SEQN, RIDRETH1, RIAGENDR, RIDAGEYR)
+```
+
+```{r}
+nhanes_data <- left_join(df, demographics, by = "SEQN")
+```
+
+```{r}
+nhanes_data <- nhanes_data %>% 
+  mutate(age_bracket = ifelse(RIDAGEYR > 40, 
+                              "old", "young"))
+```
+
+```{r}
+ggplot(nhanes_data, aes(x = RIDAGEYR, fill = DIQ010)) +
+  geom_density(alpha = 0.5)
+```
+
+P(B\|A)
+
+B \<- has diabetes
+
+A \<- old, over 40
+
+2.  Do some exploratory data analysis
+
+3.  Determine the prior probability that someone has diabetes (DIQ010)
 
     -   P(B)
 
@@ -100,7 +180,7 @@ df <- df %>%
       adorn_totals("row")
     ```
 
-5.  Determine the prior probability that someone eats tuna (DRD370B)
+4.  Determine the prior probability that someone eats tuna (DRD370B)
 
     -   P(A)
 
